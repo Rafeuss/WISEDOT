@@ -1,0 +1,26 @@
+{
+  "name": "wisedot-academywallet-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automacao de testes de API (Cypress) - Certificacao Wisedot AcademyWallet",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:report": "cypress run --reporter mochawesome --reporter-options reportDir=mochawesome-report,overwrite=false,html=false,json=true",
+    "report:merge": "mochawesome-merge mochawesome-report/*.json > mochawesome-report/merged.json",
+    "report:generate": "marge mochawesome-report/merged.json --reportDir mochawesome-report --inline",
+    "test": "npm run cy:run:report && npm run report:merge && npm run report:generate"
+  },
+  "devDependencies": {
+    "cypress": "13.17.0",
+    "ajv": "8.17.1",
+    "mochawesome": "7.1.3",
+    "mochawesome-merge": "4.3.0",
+    "mochawesome-report-generator": "6.2.0"
+  },
+  "dependencies": {
+    "bcryptjs": "2.4.3",
+    "dotenv": "16.4.7",
+    "pg": "8.13.1"
+  }
+}

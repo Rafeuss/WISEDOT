@@ -1,0 +1,23 @@
+{
+  "name": "wisedot-academywallet-perf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automacao de testes de performance (k6) - Certificacao Wisedot AcademyWallet",
+  "scripts": {
+    "login:smoke": "k6 run login/smoke.js",
+    "login:average-load": "k6 run login/average-load.js",
+    "login:soak": "k6 run login/soak.js",
+    "login:stress": "k6 run login/stress.js",
+    "login:breakpoint": "k6 run login/breakpoint.js",
+    "login:spike": "k6 run login/spike.js",
+    "pagamento:smoke": "k6 run pagamento-consulta/smoke.js",
+    "pagamento:average-load": "k6 run pagamento-consulta/average-load.js",
+    "pagamento:soak": "k6 run pagamento-consulta/soak.js",
+    "pagamento:stress": "k6 run pagamento-consulta/stress.js",
+    "pagamento:breakpoint": "k6 run pagamento-consulta/breakpoint.js",
+    "pagamento:spike": "k6 run pagamento-consulta/spike.js",
+    "investimento:smoke": "k6 run investimento-consulta/smoke.js",
+    "investimento:average-load": "k6 run investimento-consulta/average-load.js",
+    "investimento:stress": "k6 run investimento-consulta/stress.js"
+  }
+}

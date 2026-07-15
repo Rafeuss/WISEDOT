@@ -1,0 +1,12 @@
+name: Execucao manual
+
+# Nivel de integracao: execucao manual (workflow_dispatch).
+# Permite disparar a suite completa de UI + API sob demanda, direto pela aba
+# Actions do GitHub, sem depender de push/PR/agendamento.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-suite:
+    uses: ./.github/workflows/_reusable-test-suite.yml

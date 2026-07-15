@@ -1,0 +1,25 @@
+Evidência BUG-24 — validate-otp quebra com 500 para usuário que nunca solicitou OTP
+Capturado rodando api/cypress/e2e/auth/auth.cy.js (CT-API-AUTH-07b) contra o backend local.
+
+Cenário: usuário recém-seedado (usr_dt_recover_token_timestamp NULL no banco, nunca chamou
+POST /auth/request-otp) chama diretamente POST /auth/validate-otp com um token qualquer.
+
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST http://localhost:3000/auth/validate-otp \
+  -H "Content-Type: application/json" \
+  -d '{"email":"qa.seed.user@academywallet.test","token":"0000"}'
+
+{"statusCode":500,"message":"Internal server error"}
+HTTP_STATUS:500
+
+Causa raiz (AuthService.isValidToken, backend/src/auth/auth.service.ts):
+  const tokenExpiresAt = user.recoverTokenTimestamp;
+  tokenExpiresAt.setMinutes(user.recoverTokenTimestamp.getMinutes() + 5);
+
+`recoverTokenTimestamp` é `nullable: true` no banco (usr_dt_recover_token_timestamp) e nunca é
+setado no cadastro do usuário — só é preenchido depois de um POST /auth/request-otp bem-sucedido
+em gravar o token (AuthService.activeRedefinePassword). Chamar validate-otp antes disso faz
+`tokenExpiresAt` ser `null`, e `null.setMinutes(...)` estoura um TypeError não tratado.
+
+Confirmado também que, quando o usuário JÁ chamou request-otp antes (timestamp presente),
+o mesmo endpoint com token incorreto responde corretamente 401 "Token inválido" — o defeito
+é específico do caso em que nenhum OTP foi solicitado ainda.

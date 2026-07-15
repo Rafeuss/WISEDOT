@@ -1,0 +1,15 @@
+{
+  "name": "wisedot-academywallet-qa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Certificacao Wisedot - Projeto de QA AcademyWallet: automacoes de UI, API, performance e seed de dados",
+  "scripts": {
+    "seed": "node scripts/run-seed.js seed",
+    "seed:clean": "node scripts/run-seed.js clean"
+  },
+  "dependencies": {
+    "bcryptjs": "2.4.3",
+    "dotenv": "16.4.7",
+    "pg": "8.13.1"
+  }
+}

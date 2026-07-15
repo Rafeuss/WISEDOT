@@ -1,0 +1,50 @@
+{
+  "referencia": "WCAG 2.1 (Web Content Accessibility Guidelines)",
+  "nivelAlvo": "AA",
+  "ferramenta": "cypress-axe (axe-core)",
+  "automacaoRelacionada": "gui/cypress/e2e/acessibilidade/acessibilidade.cy.js",
+  "criterios": [
+    {
+      "criterio": "1.1.1 Conteúdo Não Textual",
+      "nivel": "A",
+      "coberto": true,
+      "telas_testadas": ["Login", "Home", "Pagamentos", "Cadastro", "Recuperação de senha", "Investimentos", "Notificações", "Extrato completo", "Pagamentos (etapa 2)", "Pagamentos (etapa 3)"],
+      "observacoes": "Coberto indiretamente pela regra 'image-alt' do axe-core em cada scan (cy.runA11yScan). Imagens decorativas (ex.: /step-one.svg) e informativas (ex.: foto do cadastro) precisam de atributo alt adequado; nenhuma violação relacionada foi mapeada nas 10 telas/etapas escaneadas até o momento."
+    },
+    {
+      "criterio": "1.4.3 Contraste Mínimo",
+      "nivel": "AA",
+      "coberto": true,
+      "telas_testadas": ["Login", "Home", "Pagamentos", "Cadastro", "Recuperação de senha", "Investimentos", "Notificações", "Extrato completo", "Pagamentos (etapa 2)", "Pagamentos (etapa 3)"],
+      "observacoes": "Coberto pela regra 'color-contrast' do axe-core. A paleta principal (tons de azul escuro #00253F sobre fundo branco) tende a atender a razão mínima de 4.5:1, mas não houve auditoria manual dedicada com ferramenta de contraste (ex.: para textos pequenos em cinza claro #64748B)."
+    },
+    {
+      "criterio": "2.1.1 Teclado",
+      "nivel": "A",
+      "coberto": false,
+      "telas_testadas": [],
+      "observacoes": "Sem cenário de automação dedicado à navegação 100% via teclado (Tab/Enter/Espaço) nas 3 telas. O teclado ofuscado de PIN transacional (BUG-01, componente PasswordDialog.tsx) é um risco conhecido de usabilidade/acessibilidade para navegação sem mouse, ainda não validado sob este critério especificamente."
+    },
+    {
+      "criterio": "2.4.4 Finalidade do Link (em Contexto)",
+      "nivel": "A",
+      "coberto": false,
+      "telas_testadas": [],
+      "observacoes": "O axe-core não avalia semanticamente a clareza textual de links (ex.: 'Esqueci minha senha', 'Cadastre-se', 'Voltar'). Recomenda-se revisão manual/checklist humano complementar para este critério."
+    },
+    {
+      "criterio": "3.3.2 Rótulos ou Instruções",
+      "nivel": "A",
+      "coberto": true,
+      "telas_testadas": ["Login", "Home", "Pagamentos", "Cadastro", "Recuperação de senha", "Investimentos", "Notificações", "Extrato completo", "Pagamentos (etapa 2)", "Pagamentos (etapa 3)"],
+      "observacoes": "Coberto pela regra 'label' do axe-core, que verifica se todo campo de formulário possui rótulo associado (FormLabel com htmlFor). O BUG-06 (mensagens de validação obsoletas) é um gap funcional relacionado à comunicação de erros, mas fora do escopo de detecção do axe-core."
+    },
+    {
+      "criterio": "4.1.2 Nome, Função, Valor",
+      "nivel": "A",
+      "coberto": true,
+      "telas_testadas": ["Login", "Home", "Pagamentos", "Cadastro", "Recuperação de senha", "Investimentos", "Notificações", "Extrato completo", "Pagamentos (etapa 2)", "Pagamentos (etapa 3)"],
+      "observacoes": "Coberto pelas regras 'aria-*' do axe-core (aria-valid-attr, aria-required-attr, button-name, etc.). Todas as 10 telas/etapas foram auditadas via scan automatizado, sem revisão manual adicional de nomes acessíveis customizados."
+    }
+  ]
+}

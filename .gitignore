@@ -1,0 +1,14 @@
+node_modules/
+.env
+cypress/videos/
+cypress/screenshots/
+mochawesome-report/
+k6-results/
+.DS_Store
+
+# Cypress artefatos em subprojetos (api/, gui/)
+**/cypress/screenshots/
+**/cypress/videos/
+
+# Dump do OpenAPI da aplicacao sob teste (ferramenta de auditoria, nao entregavel)
+swagger-full.json

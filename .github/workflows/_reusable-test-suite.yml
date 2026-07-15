@@ -1,0 +1,132 @@
+name: Reusable - Suite de testes UI + API
+
+# Workflow reutilizavel (workflow_call) com os passos completos de execucao da
+# suite. Os 4 workflows de gatilho (manual, agendado, deploy, integrado)
+# apenas chamam este arquivo, evitando duplicar a mesma sequencia de setup em
+# cada um deles.
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositorio WISEDOT (automacoes)
+        uses: actions/checkout@v4
+
+      - name: Checkout do AcademyWallet (aplicacao sob teste)
+        uses: actions/checkout@v4
+        with:
+          repository: wisedot/certificacao
+          path: academywallet
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar pnpm
+        run: npm install -g pnpm
+
+      - name: Criar .env do backend do AcademyWallet
+        run: |
+          cat <<'EOF' > academywallet/backend/.env
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_USER=postgres
+          DB_PASSWORD=admin
+          DB_NAME=db_wallet
+          JWT_SECRET=bG9vc2Vwb3RhdG9lc3N0YW5kYXJkY293aG9ybmhvdHNvbGlkcHJlc3Nzc3RyZWV0ZGF0
+          JWT_EXPIRATION_TIME=3600
+          JWT_RECOVERY_EXPIRATION_TIME=600
+          SALTS=12
+          SMTP_HOST=live.smtp.mailtrap.io
+          SMTP_PORT=587
+          SMTP_USER=api
+          SMTP_PASSWORD=495ebc99b53088c686feb54b974b65cb
+          EMAIL_DOMAIN=academy_wallet@demomailtrap.com
+          WEBSITE_URL=http://localhost:3001
+          CRYPT_PASSPHRASE=Y29tcGFueWZpcnN0cG9zaXRpdmVzb2xpZHNvbGRibGFua2ZyZXNobW90aGVycmVjZWk
+          REDIS_HOST=localhost
+          WEB_NOTIFICATIONS_PAGE=https://localhost:3001
+          EOF
+
+      - name: Subir backend (Docker Compose)
+        working-directory: academywallet/backend
+        run: |
+          docker compose build
+          docker compose up -d
+
+      - name: Aguardar backend responder
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api > /dev/null; then
+              echo "Backend disponivel"
+              exit 0
+            fi
+            echo "Aguardando backend... ($i/30)"
+            sleep 3
+          done
+          echo "Backend nao respondeu a tempo" && exit 1
+
+      - name: Instalar dependencias do script de seed
+        run: npm ci
+
+      - name: Popular massa de dados (seed)
+        run: npm run seed
+
+      - name: Instalar frontend do AcademyWallet
+        working-directory: academywallet/frontend
+        run: pnpm install
+
+      - name: Subir frontend em segundo plano
+        working-directory: academywallet/frontend
+        run: nohup pnpm run dev > frontend.log 2>&1 &
+
+      - name: Aguardar frontend responder
+        run: |
+          for i in $(seq 1 30); do
+            if curl -skf https://localhost:3001 > /dev/null; then
+              echo "Frontend disponivel"
+              exit 0
+            fi
+            echo "Aguardando frontend... ($i/30)"
+            sleep 3
+          done
+          echo "Frontend nao respondeu a tempo" && exit 1
+
+      - name: Instalar dependencias da automacao de API
+        working-directory: api
+        run: npm ci
+
+      - name: Rodar automacao de API
+        working-directory: api
+        run: npm run test
+
+      - name: Instalar dependencias da automacao de UI
+        working-directory: gui
+        run: npm ci
+
+      - name: Rodar automacao de UI
+        working-directory: gui
+        run: npm run test
+
+      - name: Publicar relatorios Mochawesome (API)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mochawesome-report-api
+          path: api/mochawesome-report
+
+      - name: Publicar relatorios Mochawesome (UI)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mochawesome-report-gui
+          path: gui/mochawesome-report
+
+      - name: Logs do backend em caso de falha
+        if: failure()
+        working-directory: academywallet/backend
+        run: docker compose logs
