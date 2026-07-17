@@ -86,7 +86,20 @@ cd gui && npm install && npx cypress install && cd ..
 cd api && npm install && npx cypress install && cd ..
 ```
 
-Copie `.env.example` para `.env` na raiz (os valores padrão já correspondem ao ambiente local do AcademyWallet). Se o frontend cair para HTTP (mkcert falha ao baixar em algumas redes), ajuste `FRONTEND_URL=http://localhost:3001`.
+Copie `.env.example` para `.env` **na raiz deste repositório**:
+
+```bash
+cp .env.example .env
+```
+
+Atenção: este `.env` da raiz é **diferente** do `backend/.env` da parte 1. O `backend/.env` configura a aplicação sob teste; este da raiz configura a **automação** e é lido por dois consumidores:
+
+- o **script de seed** (`db/pool.js`) — usa `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` para conectar no mesmo PostgreSQL do backend, e `SALTS` para gerar o hash das senhas no mesmo formato do backend;
+- os **dois `cypress.config.js`** (`api/` e `gui/`) — usam `FRONTEND_URL` como `baseUrl` da suíte de UI.
+
+Por isso os valores de banco e o `SALTS` no `.env` da raiz **precisam ser os mesmos** do `backend/.env`, senão o seed não conecta ou gera hashes incompatíveis com o login.
+
+Sobre o `FRONTEND_URL`: o padrão é `https://localhost:3001` (o frontend sobe em HTTPS via mkcert). Se na sua máquina o mkcert falhar e o Next servir em HTTP, ajuste para `FRONTEND_URL=http://localhost:3001` — caso contrário a suíte de UI não conecta na aplicação.
 
 ## 3. Populando a massa de dados (seed)
 

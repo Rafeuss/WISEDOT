@@ -234,4 +234,169 @@ describe('Cadastro', () => {
     CadastroPage.submit();
     CadastroPage.expectErrorToast();
   });
+
+  // CT-CAD-15 - Etapa 1 sem preenchimento
+  it('deve bloquear o avanco com a etapa 1 sem preencher', () => {
+    CadastroPage.expectStepOneVisible();
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-16 - Etapa 1 apenas com o nome preenchido
+  it('deve bloquear o avanco preenchendo apenas o nome na etapa 1', () => {
+    CadastroPage.fillStepOne({ name: 'Ana Souza' });
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-17 - Etapa 2 com CPF e RG vazios
+  it('deve bloquear o avanco com CPF e RG vazios na etapa 2', () => {
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email: generateUniqueEmail(),
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.expectStepTwoVisible();
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-18 - Etapa 3 com PIN incompleto
+  it('deve bloquear o avanco com o PIN incompleto na etapa 3', () => {
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email: generateUniqueEmail(),
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.fillStepTwo({
+      cpf: generateUniqueValidCpf(),
+      rg: VALID_RG,
+    }).nextStep();
+
+    CadastroPage.expectStepThreeVisible();
+    CadastroPage.fillPartialPin('123');
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-19 - Navegacao: Voltar preserva os dados da etapa 1
+  it('deve preservar os dados da etapa 1 ao voltar da etapa 2', () => {
+    const email = generateUniqueEmail();
+
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email,
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.expectStepTwoVisible();
+    CadastroPage.goBack();
+
+    CadastroPage.expectStepOneVisible();
+    CadastroPage.expectFieldValue('name', 'Ana Souza');
+    CadastroPage.expectFieldValue('email', email);
+    CadastroPage.expectFieldValue('password', VALID_PASSWORD);
+  });
+
+  // CT-CAD-20 - Etapa de revisao exibe os dados preenchidos
+  it('deve exibir os dados preenchidos na etapa de revisao', () => {
+    const email = generateUniqueEmail();
+
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email,
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.fillStepTwo({
+      cpf: generateUniqueValidCpf(),
+      rg: VALID_RG,
+    }).nextStep();
+
+    CadastroPage.fillTransactionPin(VALID_PIN).nextStep();
+
+    CadastroPage.expectReviewStepVisible();
+    CadastroPage.expectFieldValue('name', 'Ana Souza');
+    CadastroPage.expectFieldValue('email', email);
+    CadastroPage.expectFieldValue('rg', VALID_RG);
+  });
+
+  // CT-CAD-21 - Etapa 1 apenas com o e-mail preenchido
+  it('deve bloquear o avanco preenchendo apenas o e-mail na etapa 1', () => {
+    CadastroPage.fillStepOne({ email: generateUniqueEmail() });
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-22 - Etapa 1 apenas com a senha preenchida
+  it('deve bloquear o avanco preenchendo apenas a senha na etapa 1', () => {
+    CadastroPage.fillStepOne({ password: VALID_PASSWORD });
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-23 - Etapa 2 apenas com o CPF preenchido
+  it('deve bloquear o avanco preenchendo apenas o CPF na etapa 2', () => {
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email: generateUniqueEmail(),
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.expectStepTwoVisible();
+    CadastroPage.fillStepTwo({ cpf: generateUniqueValidCpf() });
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-24 - Etapa 2 apenas com o RG preenchido
+  it('deve bloquear o avanco preenchendo apenas o RG na etapa 2', () => {
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email: generateUniqueEmail(),
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.expectStepTwoVisible();
+    CadastroPage.fillStepTwo({ rg: VALID_RG });
+    CadastroPage.nextButtonShouldBeDisabled();
+  });
+
+  // CT-CAD-25 - Navegacao: Voltar preserva os dados da etapa 2
+  it('deve preservar os dados da etapa 2 ao voltar da etapa 3', () => {
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email: generateUniqueEmail(),
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.fillStepTwo({
+      cpf: generateUniqueValidCpf(),
+      rg: VALID_RG,
+    }).nextStep();
+
+    CadastroPage.expectStepThreeVisible();
+    CadastroPage.goBack();
+
+    CadastroPage.expectStepTwoVisible();
+    CadastroPage.expectFieldValue('rg', VALID_RG);
+    CadastroPage.expectFieldNotEmpty('cpf');
+  });
+
+  // CT-CAD-26 - Revisao: editar um campo volta para a etapa correspondente
+  it('deve voltar para a etapa 1 ao editar o nome pela tela de revisao', () => {
+    CadastroPage.fillStepOne({
+      name: 'Ana Souza',
+      email: generateUniqueEmail(),
+      password: VALID_PASSWORD,
+    }).nextStep();
+
+    CadastroPage.fillStepTwo({
+      cpf: generateUniqueValidCpf(),
+      rg: VALID_RG,
+    }).nextStep();
+
+    CadastroPage.fillTransactionPin(VALID_PIN).nextStep();
+
+    CadastroPage.expectReviewStepVisible();
+    CadastroPage.editField('name');
+
+    CadastroPage.expectStepOneVisible();
+    CadastroPage.expectFieldValue('name', 'Ana Souza');
+  });
 });

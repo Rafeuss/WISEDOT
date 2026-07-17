@@ -149,3 +149,111 @@ Funcionalidade: Cadastro de usuário
     Quando completo as demais etapas do cadastro normalmente e confirmo o envio
     Então devo permanecer na tela de cadastro, sem sucesso
 ```
+
+## CT-CAD-15 — Etapa 1 sem preenchimento
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado com a etapa 1 vazia
+    Dado que estou na etapa 1 do Cadastro
+    Quando não preencho nenhum campo
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-16 — Etapa 1 apenas com o nome
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado preenchendo apenas o nome
+    Dado que estou na etapa 1 do Cadastro
+    Quando preencho apenas o nome, deixando e-mail e senha vazios
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-17 — Etapa 2 com CPF e RG vazios
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado com CPF e RG vazios
+    Dado que estou na etapa 2 do Cadastro
+    Quando não preencho o CPF nem o RG
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-18 — Etapa 3 com PIN incompleto
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado com o PIN transacional incompleto
+    Dado que estou na etapa 3 do Cadastro
+    Quando preencho menos de 6 dígitos do PIN
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-19 — Navegação entre etapas preserva os dados
+
+```gherkin
+  Cenário: Voltar da etapa 2 para a 1 mantém os dados já preenchidos
+    Dado que preenchi a etapa 1 e avancei para a etapa 2
+    Quando clico em "Voltar"
+    Então devo ver a etapa 1 com o nome, e-mail e senha ainda preenchidos
+```
+
+## CT-CAD-20 — Etapa de revisão exibe os dados preenchidos
+
+```gherkin
+  Cenário: Revisão mostra os dados informados nas etapas anteriores
+    Dado que preenchi todas as etapas do Cadastro
+    Quando chego na etapa de revisão
+    Então devo ver o nome, e-mail e RG que informei
+```
+
+## CT-CAD-21 — Etapa 1 apenas com o e-mail
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado preenchendo apenas o e-mail
+    Dado que estou na etapa 1 do Cadastro
+    Quando preencho apenas o e-mail, deixando nome e senha vazios
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-22 — Etapa 1 apenas com a senha
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado preenchendo apenas a senha
+    Dado que estou na etapa 1 do Cadastro
+    Quando preencho apenas a senha, deixando nome e e-mail vazios
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-23 — Etapa 2 apenas com o CPF
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado preenchendo apenas o CPF
+    Dado que estou na etapa 2 do Cadastro
+    Quando preencho apenas o CPF, deixando o RG vazio
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-24 — Etapa 2 apenas com o RG
+
+```gherkin
+  Cenário: Botão "Próximo" desabilitado preenchendo apenas o RG
+    Dado que estou na etapa 2 do Cadastro
+    Quando preencho apenas o RG, deixando o CPF vazio
+    Então o botão "Próximo" deve permanecer desabilitado
+```
+
+## CT-CAD-25 — Navegação da etapa 3 para a 2 preserva os dados
+
+```gherkin
+  Cenário: Voltar da etapa 3 para a 2 mantém CPF e RG preenchidos
+    Dado que preenchi as etapas 1 e 2 e avancei para a etapa 3
+    Quando clico em "Voltar"
+    Então devo ver a etapa 2 com o CPF e o RG ainda preenchidos
+```
+
+## CT-CAD-26 — Editar um campo pela tela de revisão
+
+```gherkin
+  Cenário: Editar o nome na revisão retorna para a etapa correspondente
+    Dado que preenchi todas as etapas e cheguei na revisão
+    Quando clico no ícone de editar o nome
+    Então devo voltar para a etapa 1 com o nome ainda preenchido
+```

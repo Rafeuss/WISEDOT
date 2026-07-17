@@ -97,6 +97,38 @@ class CadastroPage {
     return cy.get('#rg').invoke('val');
   }
 
+  fillPartialPin(digits) {
+    [...digits].forEach((digit, index) => {
+      cy.get('#password input').eq(index).type(digit);
+    });
+    return this;
+  }
+
+  expectFieldValue(fieldId, value) {
+    cy.get(`#${fieldId}`).should('have.value', value);
+    return this;
+  }
+
+  expectStepOneVisible() {
+    cy.contains('seja bem-vindo').should('be.visible');
+    return this;
+  }
+
+  expectStepThreeVisible() {
+    cy.contains('Hora de criar uma senha').should('be.visible');
+    return this;
+  }
+
+  expectFieldNotEmpty(fieldId) {
+    cy.get(`#${fieldId}`).invoke('val').should('not.be.empty');
+    return this;
+  }
+
+  editField(fieldId) {
+    cy.get(`#edit-${fieldId}`).click();
+    return this;
+  }
+
   nextButtonShouldBeDisabled() {
     cy.get('#next-btn').should('be.disabled');
     return this;
