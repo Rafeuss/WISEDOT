@@ -40,6 +40,7 @@ describe('API - Auth', () => {
   it('deve retornar 422 quando a senha não é informada', () => {
     cy.apiAuthLogin(testUser.email).then((response) => {
       expect(response.status).to.eq(422);
+      expect(response.body.errors.some((e) => e.field === 'password')).to.be.true;
     });
   });
 
@@ -124,6 +125,7 @@ describe('API - Auth', () => {
   it('deve retornar 422 quando a senha de login tem menos de 5 caracteres', () => {
     cy.apiAuthLogin(testUser.email, 'Ab1@').then((response) => {
       expect(response.status).to.eq(422);
+      expect(response.body.errors.some((e) => e.field === 'password')).to.be.true;
     });
   });
 
@@ -131,6 +133,7 @@ describe('API - Auth', () => {
   it('deve retornar 422 quando a senha de login tem mais de 50 caracteres', () => {
     cy.apiAuthLogin(testUser.email, `${'a'.repeat(50)}1`).then((response) => {
       expect(response.status).to.eq(422);
+      expect(response.body.errors.some((e) => e.field === 'password')).to.be.true;
     });
   });
 
@@ -138,6 +141,7 @@ describe('API - Auth', () => {
   it('deve retornar 422 ao validar OTP com token de 3 dígitos', () => {
     cy.apiAuthValidateOtp(testUser.email, '123').then((response) => {
       expect(response.status).to.eq(422);
+      expect(response.body.errors.some((e) => e.field === 'token')).to.be.true;
     });
   });
 
@@ -145,6 +149,7 @@ describe('API - Auth', () => {
   it('deve retornar 422 ao validar OTP com token contendo letras', () => {
     cy.apiAuthValidateOtp(testUser.email, 'ab12').then((response) => {
       expect(response.status).to.eq(422);
+      expect(response.body.errors.some((e) => e.field === 'token')).to.be.true;
     });
   });
 
@@ -152,6 +157,7 @@ describe('API - Auth', () => {
   it('deve retornar 422 ao validar OTP com token de 5 dígitos', () => {
     cy.apiAuthValidateOtp(testUser.email, '12345').then((response) => {
       expect(response.status).to.eq(422);
+      expect(response.body.errors.some((e) => e.field === 'token')).to.be.true;
     });
   });
 

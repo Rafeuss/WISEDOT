@@ -212,6 +212,7 @@ describe('API - Investment', () => {
         transactionsPassword: encryptedPin,
       }).then((response) => {
         expect(response.status).to.eq(422);
+        expect(response.body.errors.some((e) => e.field === 'initialValue')).to.be.true;
       });
     });
   });
@@ -227,6 +228,7 @@ describe('API - Investment', () => {
         transactionsPassword: encryptedPin,
       }).then((response) => {
         expect(response.status).to.eq(422);
+        expect(response.body.errors.some((e) => e.field === 'initialValue')).to.be.true;
       });
     });
   });
@@ -242,6 +244,7 @@ describe('API - Investment', () => {
         transactionsPassword: encryptedPin,
       }).then((response) => {
         expect(response.status).to.eq(422);
+        expect(response.body.errors.some((e) => e.field === 'initialValue')).to.be.true;
       });
     });
   });
@@ -265,6 +268,7 @@ describe('API - Investment', () => {
             transactionsPassword: withdrawPin,
           }).then((response) => {
             expect(response.status).to.eq(422);
+            expect(response.body.errors.some((e) => e.field === 'amount')).to.be.true;
           });
         });
       });
@@ -290,6 +294,7 @@ describe('API - Investment', () => {
             transactionsPassword: withdrawPin,
           }).then((response) => {
             expect(response.status).to.eq(422);
+            expect(response.body.errors.some((e) => e.field === 'amount')).to.be.true;
           });
         });
       });
