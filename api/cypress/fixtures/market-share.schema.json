@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MarketShareListItem",
+  "description": "Schema de contrato de um item da lista de GET /market-share. Tipos validados contra a resposta real do backend (nao contra o DTO/Swagger): colunas decimais do Postgres (mts_db_*) sao mapeadas pelo TypeORM sem transformer numerico e por isso chegam como string (ex: \"11.61\"), nao como number.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "cnpj",
+    "minDeposit",
+    "yearYield",
+    "risk",
+    "dayYield",
+    "daysToRetrieve",
+    "benchmark",
+    "marketValue",
+    "manager",
+    "redemption"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "name": { "type": "string" },
+    "cnpj": { "type": "string" },
+    "minDeposit": { "type": "string", "pattern": "^-?\\d+(\\.\\d+)?$" },
+    "yearYield": { "type": "string", "pattern": "^-?\\d+(\\.\\d+)?$" },
+    "risk": {
+      "type": "string",
+      "enum": ["MUITO_BAIXO", "BAIXO", "MODERADO", "ALTO", "MUITO_ALTO"]
+    },
+    "dayYield": { "type": "string", "pattern": "^-?\\d+(\\.\\d+)?$" },
+    "daysToRetrieve": { "type": "integer" },
+    "benchmark": { "type": "string" },
+    "marketValue": { "type": "string", "pattern": "^-?\\d+(\\.\\d+)?$" },
+    "shareKeeper": { "type": ["string", "null"] },
+    "manager": { "type": "string" },
+    "marketValueYearAvg": { "type": "string", "pattern": "^-?\\d+(\\.\\d+)?$" },
+    "redemption": { "type": "string" }
+  }
+}

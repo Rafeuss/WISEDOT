@@ -1,0 +1,41 @@
+Evidência BUG-22 — current-account sem autenticação e contrato de resposta quebrado
+Capturado via curl, direto contra o backend local (http://localhost:3000), sem header Authorization.
+
+=== GET /current-account (findAll, sem token) ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" http://localhost:3000/current-account
+{"timestamp":"2026-07-14T18:25:45.155Z","statusCode":200,"error":false,"message":null,"count":null,"totalCount":null,"data":null}
+HTTP_STATUS:200
+
+=== GET /current-account/:id (registro existente, sem token) ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" http://localhost:3000/current-account/81e74ecf-7e25-4d89-91f4-2b16a6f91acf
+{"timestamp":"2026-07-14T18:25:45.205Z","statusCode":200,"error":false,"message":null,"count":null,"totalCount":null,"data":null}
+HTTP_STATUS:200
+
+=== GET /current-account/:id (id inexistente, mesmo formato UUID) ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" http://localhost:3000/current-account/00000000-0000-4000-8000-000000000000
+{"statusCode":500,"message":"Internal server error"}
+HTTP_STATUS:500
+
+=== PATCH /current-account/:id sem token, tentando alterar balance ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X PATCH http://localhost:3000/current-account/81e74ecf-7e25-4d89-91f4-2b16a6f91acf -H "Content-Type: application/json" -d '{"balance": 999999.99}'
+{"statusCode":422,"message":"Erro de validação","errors":[{"field":"balance","error":"property balance should not exist"}],"error":true}
+HTTP_STATUS:422
+
+=== PATCH /current-account/:id com corpo vazio ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X PATCH http://localhost:3000/current-account/81e74ecf-7e25-4d89-91f4-2b16a6f91acf -H "Content-Type: application/json" -d '{}'
+{"statusCode":500,"message":"Internal server error"}
+HTTP_STATUS:500
+
+=== POST /current-account (corpo qualquer) ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST http://localhost:3000/current-account -H "Content-Type: application/json" -d '{"balance": 500}'
+{"statusCode":422,"message":"Erro de validação","errors":[{"field":"wallet","error":"property wallet should not exist"},{"field":"balance","error":"property balance should not exist"}],"error":true}
+HTTP_STATUS:422
+
+=== DELETE /current-account/:id ===
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X DELETE http://localhost:3000/current-account/81e74ecf-7e25-4d89-91f4-2b16a6f91acf
+{"timestamp":"2026-07-14T18:28:13.830Z","statusCode":200,"error":false,"message":null,"count":null,"totalCount":null,"data":null}
+HTTP_STATUS:200
+
+=== Confirmação: saldo no banco continua intacto após todas as tentativas acima ===
+$ node -e "require('./db').getCurrentAccountByWalletId('4c3282c4-ec35-43d0-969c-28016711fd19').then(r => console.log(JSON.stringify(r)))"
+{"id":"81e74ecf-7e25-4d89-91f4-2b16a6f91acf","balance":"10000.00"}
