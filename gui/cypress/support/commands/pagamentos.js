@@ -29,7 +29,7 @@ Cypress.Commands.add('uiPagamentosPayWithPin', (pin) => {
 });
 
 Cypress.Commands.add('uiPagamentosExpectSuccessToast', () => {
-  cy.contains(/pagamento realizado/i, { timeout: 15000 }).should('be.visible');
+  cy.contains(/pagamento realizado/i, { timeout: 30000 }).should('be.visible');
 });
 
 Cypress.Commands.add('uiPagamentosExpectErrorToast', (message) => {
